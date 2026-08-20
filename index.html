@@ -39,7 +39,7 @@ body{font-family:Arial,sans-serif;background:#f4f6f8;margin:0;color:#1f2937}head
 </section>
 <section id="cadastro" class="section">
 <h2>🏢 Cadastro de Condomínios</h2>
-<div class="info">✅ Base operacional carregada com a lista enviada. Os itens globais <strong>1 e 12</strong> foram retirados conforme solicitado.</div>
+<div class="info">✅ <strong>Base oficial: 21 condomínios.</strong> Todos os 21 condomínios da lista enviada estão cadastrados e disponíveis para o planejamento de rotas.</div>
 <div class="form-grid"><div class="field"><label>Nome *</label><input id="nome"></div><div class="field"><label>Status</label><select id="status"><option>Ativo</option><option>Inativo</option></select></div><div class="field full"><label>Endereço *</label><input id="endereco"></div><div class="field"><label>Síndico / responsável</label><input id="sindico"></div><div class="field"><label>Telefone</label><input id="telefone"></div><div class="field full"><label>Observações</label><textarea id="observacoes"></textarea></div></div>
 <div style="margin-top:12px"><button class="btn" onclick="salvar()">💾 Salvar</button><button class="btn secondary" onclick="limpar()">↺ Limpar</button></div>
 </section>
@@ -49,6 +49,7 @@ body{font-family:Arial,sans-serif;background:#f4f6f8;margin:0;color:#1f2937}head
 const CHAVE='sistemaKhalidCondominios';let editando=null;
 const BASE={nome:'Base operacional',latitude:-23.5115,longitude:-46.4875};
 const listaCompleta=[
+['A - Norte',1,'Swiss Garden','Av. Parada Pinto, 3566 - Vila Nova Cachoeirinha, SP',-23.4694,-46.6607],
 ['A - Norte',2,'Matriz','Rua da Bica, 290 - Freguesia do Ó, SP',-23.4848,-46.7002],
 ['A - Norte',3,'Alameda Freguesia','Rua Cel. Euclides Machado, 185 - Jardim das Graças, SP',-23.4820,-46.6495],
 ['A - Norte',4,'Barra do Jacaré','Rua Barra do Jacaré (s/n) - Vila Zat, SP',-23.5182,-46.5398],
@@ -59,6 +60,7 @@ const listaCompleta=[
 ['B - Leste',3,'Mirassol','Rua Coração de Maçã, 399 - Conj. Hab. Castro Alves, SP',-23.5502,-46.4795],
 ['B - Leste',4,'Florence','Rua Chuva de Verão, 79 - Conj. Hab. Carmo, SP',-23.5408,-46.4697],
 ['B - Leste',5,'Comendador José de Lucia','Rua Cap. João Cesário, 127 - Penha, SP',-23.5235,-46.5050],
+['B - Leste',6,'Ravenna Penha','Rua Atuai, 131 - Penha, SP',-23.5230,-46.5102],
 ['B - Leste',7,'Quatro Estações','Av. Ajarani, 491 - Cidade Patriarca, SP',-23.5207,-46.4951],
 ['B - Leste',8,'Solar das Hortências','Rua João Marchiori, 371 - Cidade Patriarca, SP',-23.5201,-46.4905],
 ['C - Sul',1,'Saint Moritz','Rua Barata Ribeiro, 54 - Bela Vista, SP',-23.5572,-46.6487],
