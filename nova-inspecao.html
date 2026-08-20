@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nova Inspeção - Sistema Khalid</title>
+<style>
+body{margin:0;font-family:Arial,sans-serif;background:#f4f6f8;color:#1f2937}header{background:#111827;color:#fff;padding:18px}.container{max-width:1100px;margin:auto;padding:18px}.card{background:#fff;padding:20px;border-radius:12px;box-shadow:0 2px 8px #0001;margin-bottom:18px}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.full{grid-column:1/-1}label{font-weight:bold;font-size:14px}input,select,textarea{width:100%;box-sizing:border-box;padding:11px;border:1px solid #cbd5e1;border-radius:8px;margin-top:5px}textarea{min-height:100px}.btn{border:0;padding:11px 15px;border-radius:8px;background:#2563eb;color:#fff;cursor:pointer;margin:5px 3px}.secondary{background:#475569}.danger{background:#dc2626}.ok{background:#dcfce7;color:#166534;padding:14px;border-radius:8px;margin:12px 0}.toolbar{display:flex;gap:10px;flex-wrap:wrap}.toolbar input{flex:1}.item{border:1px solid #e5e7eb;border-radius:10px;padding:15px;margin:10px 0}.small{font-size:13px;color:#64748b}.badge{display:inline-block;padding:4px 8px;border-radius:99px;background:#e0f2fe;color:#075985;font-size:12px;font-weight:bold}@media(max-width:700px){.grid{grid-template-columns:1fr}.full{grid-column:auto}}
+</style></head>
+<body>
+<header><div class="container"><h1>🛡️ Sistema Khalid</h1><div>Gestão de Inspeções Operacionais</div></div></header>
+<main class="container">
+<div class="card"><h2>📋 Nova Inspeção</h2><p class="small">Registre a inspeção realizada no posto e mantenha o histórico operacional.</p>
+<div class="grid">
+<div><label>Data *</label><input id="data" type="date"></div>
+<div><label>Horário *</label><input id="hora" type="time"></div>
+<div><label>Condomínio *</label><input id="condominio" list="condominios" placeholder="Selecione ou digite o condomínio"><datalist id="condominios"></datalist></div>
+<div><label>Colaborador / posto</label><input id="colaborador" placeholder="Nome do colaborador"></div>
+<div><label>Tipo de inspeção</label><select id="tipo"><option>Inspeção operacional</option><option>Inspeção noturna</option><option>Visita operacional</option><option>Acompanhamento de posto</option><option>Treinamento</option><option>Retorno de ocorrência</option></select></div>
+<div><label>Resultado</label><select id="resultado"><option>Conforme</option><option>Conforme com orientação</option><option>Não conforme</option><option>Necessita acompanhamento</option></select></div>
+<div><label>Portaria / guarita</label><select id="portaria"><option>Em ordem</option><option>Com ressalvas</option><option>Não conforme</option></select></div>
+<div><label>Uniforme e apresentação</label><select id="uniforme"><option>Conforme</option><option>Com ressalvas</option><option>Não conforme</option></select></div>
+<div><label>Postura e atendimento</label><select id="postura"><option>Conforme</option><option>Com ressalvas</option><option>Não conforme</option></select></div>
+<div><label>Equipamentos / comunicação</label><select id="equipamentos"><option>Funcionando</option><option>Com ressalvas</option><option>Com falha</option></select></div>
+<div class="full"><label>Descrição da inspeção *</label><textarea id="descricao" placeholder="Descreva o que foi verificado, condições do posto, orientações e demais informações."></textarea></div>
+<div class="full"><label>Providências / orientações</label><textarea id="providencias" placeholder="Registre orientações, ajustes realizados, contato com síndico ou outras providências."></textarea></div>
+<div class="full"><label>Observações</label><textarea id="observacoes"></textarea></div>
+</div>
+<button class="btn" onclick="salvar()">💾 Salvar inspeção</button><button class="btn secondary" onclick="limpar()">↺ Limpar</button><a class="btn secondary" href="index.html" style="text-decoration:none;display:inline-block">⬅️ Voltar ao sistema</a>
+</div>
+<div class="card"><h2>📋 Histórico de inspeções</h2><div class="toolbar"><input id="busca" placeholder="🔎 Buscar por condomínio, colaborador ou resultado"><button class="btn secondary" onclick="exportar()">📄 Exportar CSV</button></div><div id="lista"></div></div>
+</main>
+<script>
+const K='sistemaKhalidInspecoes',CK='sistemaKhalidCondominios';
+function dados(){return JSON.parse(localStorage.getItem(K)||'[]')}function guardar(a){localStorage.setItem(K,JSON.stringify(a))}
+function esc(v){return String(v??'').replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\\':'&#39;'}[c]||c))}
+function carregar(){let a=JSON.parse(localStorage.getItem(CK)||'[]');document.getElementById('condominios').innerHTML=a.map(x=>`<option value="${esc(x.nome)}">`).join('')}
+function salvar(){let data=document.getElementById('data').value,hora=document.getElementById('hora').value,cond=document.getElementById('condominio').value.trim(),desc=document.getElementById('descricao').value.trim();if(!data||!hora||!cond||!desc){alert('Preencha data, horário, condomínio e descrição.');return}let a=dados();a.unshift({id:Date.now(),data,hora,condominio:cond,colaborador:document.getElementById('colaborador').value.trim(),tipo:document.getElementById('tipo').value,resultado:document.getElementById('resultado').value,portaria:document.getElementById('portaria').value,uniforme:document.getElementById('uniforme').value,postura:document.getElementById('postura').value,equipamentos:document.getElementById('equipamentos').value,descricao:desc,providencias:document.getElementById('providencias').value.trim(),observacoes:document.getElementById('observacoes').value.trim()});guardar(a);limpar();renderizar();alert('Inspeção registrada com sucesso!')}
+function limpar(){['data','hora','condominio','colaborador','descricao','providencias','observacoes'].forEach(id=>document.getElementById(id).value='');document.getElementById('resultado').value='Conforme';document.getElementById('portaria').value='Em ordem';document.getElementById('uniforme').value='Conforme';document.getElementById('postura').value='Conforme';document.getElementById('equipamentos').value='Funcionando'}
+function excluir(id){if(confirm('Excluir esta inspeção?')){guardar(dados().filter(x=>x.id!==id));renderizar()}}
+function renderizar(){let q=document.getElementById('busca').value.toLowerCase(),a=dados().filter(x=>(x.condominio+' '+x.colaborador+' '+x.tipo+' '+x.resultado+' '+x.descricao).toLowerCase().includes(q)),el=document.getElementById('lista');if(!a.length){el.innerHTML='<p class="small">Nenhuma inspeção encontrada.</p>';return}el.innerHTML=a.map(x=>`<div class="item"><b>📍 ${esc(x.condominio)}</b> <span class="badge">${esc(x.resultado)}</span><div class="small">${esc(x.data)} às ${esc(x.hora)} · ${esc(x.tipo)} · ${esc(x.colaborador||'Colaborador não informado')}</div><p><b>Portaria:</b> ${esc(x.portaria)} · <b>Uniforme:</b> ${esc(x.uniforme)} · <b>Postura:</b> ${esc(x.postura)} · <b>Equipamentos:</b> ${esc(x.equipamentos)}</p><p><b>Descrição:</b> ${esc(x.descricao)}</p>${x.providencias?`<p><b>Providências:</b> ${esc(x.providencias)}</p>`:''}${x.observacoes?`<p><b>Observações:</b> ${esc(x.observacoes)}</p>`:''}<button class="btn danger" onclick="excluir(${x.id})">🗑️ Excluir</button></div>`).join('')}
+function exportar(){let a=dados();if(!a.length){alert('Não há inspeções para exportar.');return}let rows=[['Data','Hora','Condomínio','Colaborador','Tipo','Resultado','Portaria','Uniforme','Postura','Equipamentos','Descrição','Providências','Observações'],...a.map(x=>[x.data,x.hora,x.condominio,x.colaborador,x.tipo,x.resultado,x.portaria,x.uniforme,x.postura,x.equipamentos,x.descricao,x.providencias,x.observacoes])];let csv='\ufeff'+rows.map(r=>r.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(';')).join('\n');let u=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'})),aEl=document.createElement('a');aEl.href=u;aEl.download='inspecoes-sistema-khalid.csv';aEl.click();URL.revokeObjectURL(u)}
+document.getElementById('data').value=new Date().toISOString().slice(0,10);document.getElementById('hora').value=new Date().toTimeString().slice(0,5);document.getElementById('busca').addEventListener('input',renderizar);carregar();renderizar();
+</script></body></html>
