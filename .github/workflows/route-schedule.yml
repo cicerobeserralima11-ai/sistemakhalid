@@ -1,0 +1,35 @@
+name: Atualizar controle de jornada das rotas
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/route-schedule.yml'
+permissions:
+  contents: write
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Atualizar módulo de jornada
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          marker='</body>'
+          if 'id="jornada-config"' not in s:
+              extra='''<section id="jornada-config" class="section"><h2>🕐 Controle da Jornada</h2><div class="form-grid"><div class="field"><label>Início da jornada</label><input id="horaInicio" type="time" value="19:00"></div><div class="field"><label>Retorno obrigatório à base</label><input id="horaLimite" type="time" value="05:00"></div><div class="field"><label>Tempo de inspeção por condomínio</label><input id="tempoVisita" type="number" min="0" value="20"></div></div><p class="small" style="margin-top:10px">O sistema considera deslocamento pela malha viária, tempo de cada inspeção e o retorno da última visita para a base.</p></section>'''
+              s=s.replace(marker,extra+marker)
+          if 'function avaliarJornadaKhalid' not in s:
+              script='''<script>function minutosK(v){let[a,b]=v.split(':').map(Number);return a*60+b}function duracaoK(a,b){let d=b-a;if(d<0)d+=1440;return d}function avaliarJornadaKhalid(rota,totalDeslocamentoSeg){const hi=document.getElementById('horaInicio')?.value||'19:00',hl=document.getElementById('horaLimite')?.value||'05:00',tv=Number(document.getElementById('tempoVisita')?.value||20),inicio=minutosK(hi),limite=minutosK(hl),direcao=Math.round(totalDeslocamentoSeg/60),visitas=rota.length,tempoTotal=direcao+visitas*tv;const volta=Math.max(0,0);const chegada=inicio+tempoTotal;const limiteAbs=inicio+duracaoK(inicio,limite);const cabe=chegada<=limiteAbs;const h=Math.floor((tempoTotal)/60),m=tempoTotal%60;const previsao=((chegada%1440)+1440)%1440;const ph=String(Math.floor(previsao/60)).padStart(2,'0'),pm=String(previsao%60).padStart(2,'0');return {cabe,tempoTotal,h,m,chegada:`${ph}:${pm}`,limite:`${String(Math.floor(limite/60)).padStart(2,'0')}:${String(limite%60).padStart(2,'0')}`}}window._avaliarJornadaKhalid=avaliarJornadaKhalid;</script>'''
+              s=s.replace(marker,script+marker)
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Commit
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git diff --cached --quiet || git commit -m 'Adicionar parâmetros de jornada às rotas'
+          git push
