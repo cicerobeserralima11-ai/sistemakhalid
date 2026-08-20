@@ -17,7 +17,6 @@
 <script>
 const CHAVE='sistemaKhalidCondominios';let editando=null;
 const importacaoInicial=[
-['Paulistano I','Rua Dríades, 74/180 – São Miguel'],
 ['Mirassol','Rua Coração de Maçã, 399'],
 ['Florence','Rua Chuva de Verão, 79'],
 ['Comendador José de Lucia','Rua Capitão João Cesário, 127 – Penha'],
@@ -28,13 +27,12 @@ const importacaoInicial=[
 ['Spot Alto da Boa Vista','Rua Dr. Antônio Bento, 339/345 – Santo Amaro'],
 ['Vita São Miguel','Rua João Felisberto Moreira, 174'],
 ['Clarice Lispector','Rua Clarice Lispector, 454'],
-['Jardim do Louvre','Rua José Flávio, 148/174'],
 ['Swiss Garden','Av. Parada Pinto, 3562/3566'],
 ['Saint Moritz','Rua Barata Ribeiro, 54 – Bela Vista']
 ];
 function dados(){return JSON.parse(localStorage.getItem(CHAVE)||'[]')}
 function guardar(arr){localStorage.setItem(CHAVE,JSON.stringify(arr))}
-function importar(){let arr=dados();const nomes=new Set(arr.map(x=>x.nome.toLowerCase()));let adicionados=0;importacaoInicial.forEach(([nome,endereco])=>{if(!nomes.has(nome.toLowerCase())){arr.push({id:Date.now()+adicionados,nome,endereco,sindico:'',telefone:'',status:'Ativo',observacoes:'Importado da lista operacional do Sistema Khalid.'});adicionados++}});guardar(arr);return adicionados}
+function importar(){let arr=dados();arr=arr.filter(x=>x.nome.toLowerCase()!=='paulistano i'&&x.nome.toLowerCase()!=='jardim do louvre');const nomes=new Set(arr.map(x=>x.nome.toLowerCase()));let adicionados=0;importacaoInicial.forEach(([nome,endereco])=>{if(!nomes.has(nome.toLowerCase())){arr.push({id:Date.now()+adicionados,nome,endereco,sindico:'',telefone:'',status:'Ativo',observacoes:'Importado da lista operacional do Sistema Khalid.'});adicionados++}});guardar(arr);return adicionados}
 function escapeHtml(v){return String(v||'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
 function salvarCondominio(){const nome=document.getElementById('nome').value.trim(),endereco=document.getElementById('endereco').value.trim();if(!nome||!endereco){alert('Preencha o nome e o endereço do condomínio.');return}let arr=dados();const item={id:editando||Date.now(),nome,endereco,sindico:document.getElementById('sindico').value.trim(),telefone:document.getElementById('telefone').value.trim(),status:document.getElementById('status').value,observacoes:document.getElementById('observacoes').value.trim()};if(editando){arr=arr.map(x=>x.id===editando?item:x);editando=null}else arr.push(item);guardar(arr);limparFormulario();renderizar();alert('Condomínio salvo com sucesso!')}
 function editar(id){const x=dados().find(v=>v.id===id);if(!x)return;editando=id;document.getElementById('nome').value=x.nome;document.getElementById('endereco').value=x.endereco;document.getElementById('sindico').value=x.sindico;document.getElementById('telefone').value=x.telefone;document.getElementById('status').value=x.status;document.getElementById('observacoes').value=x.observacoes;window.scrollTo({top:document.getElementById('cadastro').offsetTop-10,behavior:'smooth'})}
