@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistema Khalid</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: #f4f6f8;
+      color: #1f2937;
+    }
+
+    header {
+      background: #111827;
+      color: white;
+      padding: 20px;
+    }
+
+    header h1 {
+      font-size: 25px;
+      margin-bottom: 5px;
+    }
+
+    header p {
+      color: #cbd5e1;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.08);
+    }
+
+    .card h2 {
+      font-size: 18px;
+      margin-bottom: 8px;
+    }
+
+    .card p {
+      color: #64748b;
+    }
+
+    .menu {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 15px;
+    }
+
+    button {
+      border: none;
+      padding: 18px;
+      border-radius: 10px;
+      background: #2563eb;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #1d4ed8;
+    }
+
+    .section {
+      margin-top: 25px;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.08);
+    }
+
+    footer {
+      text-align: center;
+      padding: 25px;
+      color: #64748b;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="container">
+    <h1>🛡️ Sistema Khalid</h1>
+    <p>Gestão de Inspeções Operacionais</p>
+  </div>
+</header>
+
+<main class="container">
+
+  <div class="cards">
+
+    <div class="card">
+      <h2>📍 Visitas</h2>
+      <p>Controle das inspeções realizadas.</p>
+    </div>
+
+    <div class="card">
+      <h2>🏢 Condomínios</h2>
+      <p>Cadastro e acompanhamento dos postos.</p>
+    </div>
+
+    <div class="card">
+      <h2>🗺️ Rotas</h2>
+      <p>Organização das rotas operacionais.</p>
+    </div>
+
+    <div class="card">
+      <h2>📋 Ocorrências</h2>
+      <p>Registro das ocorrências operacionais.</p>
+    </div>
+
+  </div>
+
+  <div class="section">
+    <h2>Menu Operacional</h2>
+
+    <div class="menu" style="margin-top:15px;">
+
+      <button onclick="alert('Módulo de Inspeções em desenvolvimento.')">
+        📋 Nova Inspeção
+      </button>
+
+      <button onclick="alert('Módulo de Condomínios em desenvolvimento.')">
+        🏢 Condomínios
+      </button>
+
+      <button onclick="alert('Módulo de Rotas em desenvolvimento.')">
+        🗺️ Planejar Rota
+      </button>
+
+      <button onclick="alert('Módulo de Ocorrências em desenvolvimento.')">
+        🚨 Registrar Ocorrência
+      </button>
+
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  Sistema Khalid © 2026
+</footer>
+
+</body>
+</html>
