@@ -1,15 +1,21 @@
-/* KHALID CLOUD SYNC v2.0 — banco online sem duplicacoes entre aparelhos/paginas. */
+/* KHALID CLOUD SYNC v2.1 + AUTH — banco online e acesso protegido. */
 (function(){
   const SUPABASE_URL='https://kwuxixucspzqfhzxkimc.supabase.co';
   const SUPABASE_KEY='sb_publishable_vsenwbLiBHSyiZrqDvhtyQ_fgiABbrh';
+  const AUTH_SESSION='khalidAuthSession';
+  const isLogin=/\/login\.html$/i.test(location.pathname);
+  function authGuard(){
+    if(isLogin)return;
+    try{const s=JSON.parse(localStorage.getItem(AUTH_SESSION)||'null');if(!s?.access_token){location.replace('login.html');return false}}catch(e){location.replace('login.html');return false}
+  }
+  if(!authGuard())return;
   const TABLES={sistemaKhalidCondominios:'condominios',sistemaKhalidInspecoes:'inspecoes',sistemaKhalidOcorrencias:'ocorrencias',khalidTreinamentos:'treinamentos'};
   const headers={'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':'application/json','Prefer':'return=representation'};
-  const originalSet=Storage.prototype.setItem; let syncing=false;
+  const originalSet=Storage.prototype.setItem;let syncing=false;
   function read(k){try{const v=JSON.parse(localStorage.getItem(k)||'[]');return Array.isArray(v)?v:[]}catch(e){return[]}}
   function write(k,v){originalSet.call(localStorage,k,JSON.stringify(v))}
   function clean(v){return String(v??'').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,' ')}
   function iso(v){if(!v)return new Date().toISOString();const d=new Date(v);return isNaN(d)?new Date().toISOString():d.toISOString()}
-  /* Nunca usa o UUID gerado pelo banco como identidade do registro: o fingerprint precisa ser igual no celular e no notebook. */
   function fp(k,x){
     if(k==='sistemaKhalidCondominios')return 'c|'+clean(x.nome||x.name)+'|'+clean(x.endereco);
     if(k==='sistemaKhalidInspecoes')return 'i|'+clean(x.condominio_nome||x.condominio)+'|'+iso(x.data_inspecao||x.data)+'|'+clean(x.inspetor||x.supervisor)+'|'+clean(x.resultado||x.status)+'|'+clean(x.observacoes||x.descricao);
@@ -30,20 +36,7 @@
     if(k==='khalidTreinamentos')return {...x,id:x.id,colaborador:x.colaborador_nome,condominio:x.condominio_nome,re:x.re,horas:x.carga_horaria,data:x.data_treinamento,obs:x.observacoes};
   }
   async function req(table,method,body){const r=await fetch(SUPABASE_URL+'/rest/v1/'+table,{method,headers,...(body?{body:JSON.stringify(body)}:{})});if(!r.ok)throw new Error(await r.text());return r.status===204?[]:r.json()}
-  async function syncKey(k){
-    const table=TABLES[k];if(!table)return;
-    const local=read(k);const cloud=await req(table,'GET');
-    /* Primeiro consolida o banco: um registro por fingerprint. */
-    const cloudUnique=new Map();for(const x of cloud){const f=fp(k,x);if(!cloudUnique.has(f))cloudUnique.set(f,x)}
-    /* Envia somente registros locais que ainda não existem no banco. */
-    const localUnique=new Map();for(const x of local)localUnique.set(fp(k,x),x);
-    for(const [f,x] of localUnique){if(!cloudUnique.has(f)){try{const created=await req(table,'POST',toCloud(k,x));const y=Array.isArray(created)?created[0]:created;if(y)cloudUnique.set(f,y)}catch(e){console.warn('KHALID CLOUD upload',table,e)}}}
-    /* Busca novamente e consolida por fingerprint; isso impede crescimento a cada refresh. */
-    const fresh=await req(table,'GET');const merged=new Map();
-    for(const x of fresh){const f=fp(k,x);if(!merged.has(f))merged.set(f,fromCloud(k,x))}
-    for(const x of localUnique.values()){const f=fp(k,x);if(!merged.has(f))merged.set(f,x)}
-    write(k,Array.from(merged.values()));
-  }
+  async function syncKey(k){const table=TABLES[k];if(!table)return;const local=read(k);const cloud=await req(table,'GET');const cloudUnique=new Map();for(const x of cloud){const f=fp(k,x);if(!cloudUnique.has(f))cloudUnique.set(f,x)}const localUnique=new Map();for(const x of local)localUnique.set(fp(k,x),x);for(const [f,x] of localUnique){if(!cloudUnique.has(f)){try{const created=await req(table,'POST',toCloud(k,x));const y=Array.isArray(created)?created[0]:created;if(y)cloudUnique.set(f,y)}catch(e){console.warn('KHALID CLOUD upload',table,e)}}}const fresh=await req(table,'GET');const merged=new Map();for(const x of fresh){const f=fp(k,x);if(!merged.has(f))merged.set(f,fromCloud(k,x))}for(const x of localUnique.values()){const f=fp(k,x);if(!merged.has(f))merged.set(f,x)}write(k,Array.from(merged.values()))}
   async function syncAll(){if(syncing)return;syncing=true;try{for(const k of Object.keys(TABLES))await syncKey(k);originalSet.call(localStorage,'khalidCloudLastSync',new Date().toISOString());window.dispatchEvent(new CustomEvent('khalid-cloud-synced'))}catch(e){console.warn('KHALID CLOUD indisponível:',e)}finally{syncing=false}}
   Storage.prototype.setItem=function(k,v){originalSet.call(this,k,v);if(!syncing&&TABLES[k])Promise.resolve().then(()=>syncKey(k)).catch(e=>console.warn('KHALID CLOUD',e))};
   window.KhalidCloud={syncAll,syncKey,url:SUPABASE_URL};
