@@ -1,0 +1,32 @@
+name: Integrar KHALID Cloud
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  inject:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Integrar camada Cloud nos HTML
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          marker='<script src="khalid-cloud.js"></script>'
+          for p in Path('.').glob('*.html'):
+              text=p.read_text(encoding='utf-8')
+              if 'khalid-cloud.js' in text:
+                  continue
+              if '</body>' in text:
+                  text=text.replace('</body>', marker+'</body>', 1)
+                  p.write_text(text, encoding='utf-8')
+          PY
+      - name: Publicar alterações
+        run: |
+          git config user.name 'KHALID Cloud Bot'
+          git config user.email 'actions@github.com'
+          git add '*.html'
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'chore: connect HTML modules to KHALID Cloud'
+          git push
