@@ -44,4 +44,4 @@ document.getElementById('form').addEventListener('submit',e=>{e.preventDefault()
 function excluir(id){if(!confirm('Excluir este registro?'))return;localStorage.setItem(KEY,JSON.stringify(getIns().filter(x=>x.id!==id)));render()}
 function exportar(){const arr=getIns();if(!arr.length){alert('Não há inspeções para exportar.');return}const cols=['data','hora','condominio','colaborador','tipo','resultado','descricao','providencias','observacoes'];const csv=[cols.join(';'),...arr.map(x=>cols.map(c=>'"'+String(x[c]??'').replace(/"/g,'""')+'"').join(';'))].join('\n');const blob=new Blob([new Uint8Array([0xEF,0xBB,0xBF]),csv],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='inspecoes_sistema_khalid.csv';a.click();URL.revokeObjectURL(a.href)}
 carregarCondominios();limparForm();render();
-</script></body></html>
+</script><script src="khalid-cloud.js"></script></body></html>

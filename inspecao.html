@@ -14,4 +14,4 @@ function limpar(){document.getElementById('condominio').value='';document.getEle
 function excluir(id){if(confirm('Excluir esta inspeção?')){localStorage.setItem(KEY,JSON.stringify(arr().filter(x=>x.id!==id)));renderizar()}}
 function renderizar(){const q=(document.getElementById('busca')?.value||'').toLowerCase();const a=arr().filter(x=>(x.data+' '+x.hora+' '+x.condominio+' '+x.inspetor+' '+x.resultado).toLowerCase().includes(q));document.getElementById('lista').innerHTML=a.sort((x,y)=>(y.data+y.hora).localeCompare(x.data+x.hora)).map(x=>'<tr><td>'+esc(x.data)+'</td><td>'+esc(x.hora)+'</td><td><strong>'+esc(x.condominio)+'</strong><br><span class="small">'+esc(x.observacoes)+'</span></td><td>'+esc(x.inspetor)+'</td><td>'+esc(x.resultado)+'</td><td><button class="btn" onclick="excluir('+x.id+')">🗑️</button></td></tr>').join('')||'<tr><td colspan="6">Nenhuma inspeção registrada.</td></tr>'}
 carregar();
-</script></body></html>
+</script><script src="khalid-cloud.js"></script></body></html>
